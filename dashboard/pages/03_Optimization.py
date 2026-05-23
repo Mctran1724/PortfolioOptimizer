@@ -207,10 +207,33 @@ else:
                 st.markdown("#### Allocation Weights Donut")
                 render_weights_donut(res.weights)
             with c_table:
-                st.markdown("#### Weight Allocation Table")
+                st.markdown("#### Allocation Weight & Value")
                 df_weights = pd.DataFrame(list(res.weights.items()), columns=["Asset", "Weight"])
                 df_weights["Allocation %"] = df_weights["Weight"] * 100.0
-                st.dataframe(df_weights[["Asset", "Allocation %"]].style.format({"Allocation %": "{:.2f}%"}), hide_index=True, use_container_width=True)
+                
+                # Fetch total portfolio value if available
+                portfolio_obj = get_state("current_portfolio")
+                total_val = portfolio_obj.total_value if (portfolio_obj is not None and portfolio_obj.total_value > 0) else 100000.0
+                df_weights["Dollar Allocation"] = df_weights["Weight"] * total_val
+                
+                if portfolio_obj is not None and portfolio_obj.total_value > 0:
+                    st.dataframe(
+                        df_weights[["Asset", "Allocation %", "Dollar Allocation"]].style.format({
+                            "Allocation %": "{:.2f}%",
+                            "Dollar Allocation": "${:,.2f}"
+                        }),
+                        hide_index=True,
+                        use_container_width=True
+                    )
+                    st.write(f"*(Calculated based on total portfolio value of **${portfolio_obj.total_value:,.2f}**)*")
+                else:
+                    st.dataframe(
+                        df_weights[["Asset", "Allocation %"]].style.format({
+                            "Allocation %": "{:.2f}%"
+                        }),
+                        hide_index=True,
+                        use_container_width=True
+                    )
                 
                 # Show aggregate portfolio Beta
                 p_beta = res.additional_metrics.get("portfolio_beta", 1.0)

@@ -8,6 +8,7 @@ from portfolio_optimizer.models.optimization_result import OptimizationResult
 # Session state keys and their default initial values
 STATE_DEFAULTS = {
     "tickers": ["QQQ", "SPY", "VNQ", "TLT", "TIP"],
+    "portfolio_amounts": {"QQQ": 30000.0, "SPY": 25000.0, "VNQ": 15000.0, "TLT": 20000.0, "TIP": 10000.0},
     "historical_prices": None,
     "historical_returns": None,
     "optimization_results": {},

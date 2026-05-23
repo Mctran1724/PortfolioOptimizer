@@ -67,3 +67,39 @@ def test_annuity_payoff():
     # Test index return of -10% with 0% floor
     payoff_negative = calculate_indexed_annuity_payoff(np.array([-0.10]), participation_rate=0.8, cap_rate=0.08, floor_rate=0.0)
     assert np.isclose(payoff_negative[0], 0.0)
+
+def test_portfolio_dollar_amounts():
+    from portfolio_optimizer.models.portfolio import Portfolio
+    from portfolio_optimizer.models.asset import EquityAsset, FixedIncomeAsset
+    
+    assets = {
+        "QQQ": EquityAsset("QQQ", "Nasdaq ETF", beta=1.2),
+        "TLT": FixedIncomeAsset("TLT", "Long Term Treasury", duration=8.0)
+    }
+    
+    # 1. Initialize with dollar amounts
+    amounts = {"QQQ": 60000.0, "TLT": 40000.0}
+    portfolio = Portfolio(assets=assets, amounts=amounts)
+    
+    assert portfolio.total_value == 100000.0
+    assert np.isclose(portfolio.get_asset_weight("QQQ"), 0.6)
+    assert np.isclose(portfolio.get_asset_weight("TLT"), 0.4)
+    assert np.isclose(portfolio.get_asset_percentage("QQQ"), 60.0)
+    assert np.isclose(portfolio.get_asset_percentage("TLT"), 40.0)
+    assert portfolio.get_asset_amount("QQQ") == 60000.0
+    assert portfolio.get_asset_amount("TLT") == 40000.0
+    
+    # 2. Initialize with weights and total value
+    weights = {"QQQ": 0.3, "TLT": 0.7}
+    portfolio_w = Portfolio(assets=assets, weights=weights, total_value=50000.0)
+    
+    assert portfolio_w.total_value == 50000.0
+    assert np.isclose(portfolio_w.get_asset_weight("QQQ"), 0.3)
+    assert np.isclose(portfolio_w.get_asset_weight("TLT"), 0.7)
+    assert portfolio_w.get_asset_amount("QQQ") == 15000.0
+    assert portfolio_w.get_asset_amount("TLT") == 35000.0
+    
+    # 3. Calculate portfolio level statistics
+    assert np.isclose(portfolio.calculate_portfolio_beta(), 0.72) # 0.6 * 1.2 + 0.4 * 0.0
+    assert np.isclose(portfolio.calculate_portfolio_duration(), 8.0) # weighted only over FI assets
+

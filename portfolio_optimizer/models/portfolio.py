@@ -1,26 +1,76 @@
-"""Portfolio class to represent a collection of assets with weights."""
+"""Portfolio class to represent a collection of assets with weights and dollar amounts."""
 
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from portfolio_optimizer.models.asset import Asset, EquityAsset, REITAsset, FixedIncomeAsset, SVFAsset, AnnuityAsset
 from portfolio_optimizer.utils.constants import EQUITY, REIT, FIXED_INCOME, SVF, ANNUITY
 
 class Portfolio:
-    """Represents an investment portfolio of traditional and non-equity assets."""
+    """Represents an investment portfolio of traditional and non-equity assets with values."""
     
-    def __init__(self, assets: Dict[str, Asset], weights: Dict[str, float]):
-        self.assets = assets
-        # Normalize weights to sum to 1.0 if not already
-        total_weight = sum(weights.values())
-        if total_weight > 0 and not np.isclose(total_weight, 1.0):
-            self.weights = {k: v / total_weight for k, v in weights.items()}
+    def __init__(
+        self, 
+        assets: Union[Dict[str, Asset], List[Asset]], 
+        weights: Optional[Dict[str, float]] = None,
+        amounts: Optional[Dict[str, float]] = None,
+        total_value: Optional[float] = None
+    ):
+        # Handle assets as list or dict
+        if isinstance(assets, list):
+            self.assets = {asset.symbol: asset for asset in assets}
         else:
-            self.weights = weights.copy()
+            self.assets = assets.copy()
+            
+        self.amounts = {}
+        self.weights = {}
+        self.total_value = 0.0
+
+        if amounts is not None:
+            self.amounts = {k: float(v) for k, v in amounts.items()}
+            self.total_value = float(sum(self.amounts.values()))
+            if self.total_value > 0:
+                self.weights = {k: v / self.total_value for k, v in self.amounts.items()}
+            else:
+                self.weights = {k: 0.0 for k in self.amounts.keys()}
+        elif weights is not None:
+            # Handle weights normalization if sum is not 1.0
+            total_weight = sum(weights.values())
+            if total_weight > 0 and not np.isclose(total_weight, 1.0):
+                self.weights = {k: v / total_weight for k, v in weights.items()}
+            else:
+                self.weights = weights.copy()
+            
+            if total_value is not None:
+                self.total_value = float(total_value)
+                self.amounts = {k: w * self.total_value for k, w in self.weights.items()}
+            else:
+                self.total_value = 0.0
+                self.amounts = {k: 0.0 for k in self.weights.keys()}
+        else:
+            # If neither is provided, initialize empty weights/amounts for all assets
+            self.weights = {k: 0.0 for k in self.assets.keys()}
+            self.amounts = {k: 0.0 for k in self.assets.keys()}
+            self.total_value = 0.0
+
+        # Fill in missing weights/amounts for any assets not specified
+        for symbol in self.assets:
+            if symbol not in self.weights:
+                self.weights[symbol] = 0.0
+            if symbol not in self.amounts:
+                self.amounts[symbol] = 0.0
 
     def get_asset_weight(self, symbol: str) -> float:
         """Returns the weight of the asset in the portfolio."""
         return self.weights.get(symbol, 0.0)
+
+    def get_asset_percentage(self, symbol: str) -> float:
+        """Returns the percentage weight (0-100) of the asset in the portfolio."""
+        return self.get_asset_weight(symbol) * 100.0
+
+    def get_asset_amount(self, symbol: str) -> float:
+        """Returns the dollar amount invested in the asset."""
+        return self.amounts.get(symbol, 0.0)
 
     def calculate_portfolio_beta(self) -> float:
         """Calculates the weighted average Beta of the equity portions of the portfolio."""

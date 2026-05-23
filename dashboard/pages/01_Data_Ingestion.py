@@ -40,6 +40,68 @@ with col1:
     # Process tickers input
     tickers_list = [t.strip().upper() for t in tickers_str.split(",") if t.strip()]
 
+    # Sync portfolio_amounts in session state with tickers_list
+    current_amounts = get_state("portfolio_amounts") or {}
+    updated_amounts = {}
+    for t in tickers_list:
+        updated_amounts[t] = current_amounts.get(t, 10000.0)
+
+    st.markdown("#### 💰 Current Holdings (Dollar Values)")
+    with st.expander("Configure Asset Values", expanded=True):
+        for asset in tickers_list:
+            updated_amounts[asset] = st.number_input(
+                f"Holding value for {asset} ($)",
+                value=float(updated_amounts[asset]),
+                min_value=0.0,
+                step=1000.0,
+                key=f"amt_input_{asset}"
+            )
+
+    # Save the updated amounts to session state
+    set_state("portfolio_amounts", updated_amounts)
+
+    # Build Asset and Portfolio objects to cache in session state
+    from portfolio_optimizer.models.portfolio import Portfolio
+    from portfolio_optimizer.models.asset import Asset, EquityAsset, REITAsset, FixedIncomeAsset, SVFAsset, AnnuityAsset
+    
+    # Estimate betas for the assets if returns are available
+    asset_betas = {}
+    returns_df = get_state("historical_returns")
+    if returns_df is not None:
+        benchmark_col = "SPY" if "SPY" in returns_df.columns else returns_df.columns[0]
+        cov_mat_raw = returns_df.cov()
+        if benchmark_col in cov_mat_raw.columns:
+            bench_var = cov_mat_raw.loc[benchmark_col, benchmark_col]
+            for asset in tickers_list:
+                if asset in cov_mat_raw.columns and bench_var > 0:
+                    asset_betas[asset] = cov_mat_raw.loc[asset, benchmark_col] / bench_var
+                else:
+                    asset_betas[asset] = 1.0
+        else:
+            for asset in tickers_list:
+                asset_betas[asset] = 1.0
+    else:
+        for asset in tickers_list:
+            asset_betas[asset] = 1.0
+
+    def create_asset_by_ticker(ticker: str, beta: float = 1.0) -> Asset:
+        ticker_upper = ticker.upper()
+        if "VNQ" in ticker_upper or "REIT" in ticker_upper:
+            return REITAsset(ticker, f"{ticker} REIT")
+        elif "TLT" in ticker_upper or "TIP" in ticker_upper or "BND" in ticker_upper:
+            is_tips = "TIP" in ticker_upper
+            return FixedIncomeAsset(ticker, f"{ticker} Fixed Income", duration=6.0, is_tips=is_tips)
+        elif "SVF" in ticker_upper:
+            return SVFAsset(ticker, "Stable Value Fund")
+        elif "ANNUITY" in ticker_upper:
+            return AnnuityAsset(ticker, "Indexed Annuity")
+        else:
+            return EquityAsset(ticker, f"{ticker} Equity", beta=beta)
+
+    assets_dict = {ticker: create_asset_by_ticker(ticker, beta=asset_betas.get(ticker, 1.0)) for ticker in tickers_list}
+    portfolio_obj = Portfolio(assets=assets_dict, amounts=updated_amounts)
+    set_state("current_portfolio", portfolio_obj)
+
     # FRED Key Input
     fred_key = st.text_input(
         "FRED API Key (Optional)",
@@ -103,6 +165,52 @@ with col1:
                 st.error(f"Data validation error: {e}")
 
 with col2:
+    portfolio_obj = get_state("current_portfolio")
+    if portfolio_obj is not None:
+        st.markdown("### 💰 Current Portfolio Holdings & Weights")
+        st.markdown(
+            f"""
+            <div class="metric-card" style="padding: 15px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <div class="metric-label">Total Portfolio Value</div>
+                        <div class="metric-value" style="font-size: 1.8rem; color: #818CF8;">${portfolio_obj.total_value:,.2f}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Portfolio Beta</div>
+                        <div class="metric-value" style="font-size: 1.8rem; color: #34D399;">{portfolio_obj.calculate_portfolio_beta():.3f}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Weighted FI Duration</div>
+                        <div class="metric-value" style="font-size: 1.8rem; color: #F59E0B;">{portfolio_obj.calculate_portfolio_duration():.2f} years</div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # Display table of assets, asset types, dollar amounts, and weights
+        holdings_data = []
+        for symbol, asset in portfolio_obj.assets.items():
+            holdings_data.append({
+                "Asset Symbol": symbol,
+                "Asset Type": asset.asset_type,
+                "Dollar Value": portfolio_obj.get_asset_amount(symbol),
+                "Allocation %": portfolio_obj.get_asset_percentage(symbol)
+            })
+        
+        df_holdings = pd.DataFrame(holdings_data)
+        st.dataframe(
+            df_holdings.style.format({
+                "Dollar Value": "${:,.2f}",
+                "Allocation %": "{:.2f}%"
+            }),
+            use_container_width=True,
+            hide_index=True
+        )
+        st.markdown("---")
+
     st.markdown("### 📊 Ingested Data Quality Report")
 
     returns_df = get_state("historical_returns")
