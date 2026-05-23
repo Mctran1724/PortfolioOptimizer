@@ -3,8 +3,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from dashboard.utils.state_management import initialize_state, get_state
-from dashboard.components.portfolio_viz import render_cumulative_returns_chart
+from utils.state_management import initialize_state, get_state
+from components.portfolio_viz import render_cumulative_returns_chart
 from portfolio_optimizer.analytics.risk_metrics import calculate_sharpe_ratio, calculate_sortino_ratio
 from portfolio_optimizer.analytics.tail_risk import calculate_max_drawdown, calculate_cvar
 

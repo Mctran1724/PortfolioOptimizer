@@ -4,9 +4,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import riskfolio as rp
-from dashboard.utils.state_management import initialize_state, get_state, set_state
-from dashboard.components.metrics_display import render_metrics_grid
-from dashboard.components.portfolio_viz import render_weights_donut
+from utils.state_management import initialize_state, get_state, set_state
+from components.metrics_display import render_metrics_grid
+from components.portfolio_viz import render_weights_donut
 from portfolio_optimizer.optimization.traditional import MeanVarianceOptimizer, RiskParityOptimizer
 from portfolio_optimizer.optimization.hierarchical import HRPOptimizer, HERCOptimizer
 from portfolio_optimizer.optimization.kelly_criterion import KellyOptimizer

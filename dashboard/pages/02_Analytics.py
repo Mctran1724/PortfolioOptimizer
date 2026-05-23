@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from dashboard.utils.state_management import initialize_state, get_state, set_state
+from utils.state_management import initialize_state, get_state, set_state
 from portfolio_optimizer.data.cache import DataCache
 from portfolio_optimizer.analytics.fixed_income import calculate_bond_duration_and_convexity, calculate_breakeven_inflation, simulate_svf_crediting_rate
 from portfolio_optimizer.analytics.annuities import monte_carlo_annuity_pricing, calculate_indexed_annuity_payoff
