@@ -14,7 +14,7 @@ from utils.state_management import initialize_state, get_state
 # Page Configuration
 st.set_page_config(
     page_title="Investment Portfolio Optimizer",
-    page_icon="📊",
+    page_icon="./assets/logo/logo.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
