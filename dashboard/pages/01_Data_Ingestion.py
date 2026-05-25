@@ -118,7 +118,7 @@ with col1:
     clear_cache = st.checkbox("Clear Cache on Download", value=False)
 
     # Action Button
-    if st.button("Download & Ingest Dataset", use_container_width=True):
+    if st.button("Download & Ingest Dataset", width="stretch"):
         with st.spinner("Downloading data from Yahoo Finance and FRED..."):
             # Setup engines
             engine = DataIngestionEngine(fred_api_key=fred_key if fred_key else None)
@@ -206,7 +206,7 @@ with col2:
                 "Dollar Value": "${:,.2f}",
                 "Allocation %": "{:.2f}%"
             }),
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
         st.markdown("---")
@@ -243,14 +243,14 @@ with col2:
 
         # Display sample prices
         st.markdown("#### Adjusted Closing Prices (Recent Samples)")
-        st.dataframe(prices_df.tail(), use_container_width=True)
+        st.dataframe(prices_df.tail(), width='stretch')
 
         # Display asset correlations
         st.markdown("#### Return Correlations (Raw Matrix)")
         corr = returns_df.corr()
         st.dataframe(
             corr.style.background_gradient(cmap="coolwarm", axis=None),
-            use_container_width=True,
+            width='stretch',
         )
 
     else:
@@ -264,7 +264,7 @@ with col2:
         cached_prices = cache.load("prices")
 
         if cached_returns is not None and cached_prices is not None:
-            if st.button("Load Cached Local Data", use_container_width=True):
+            if st.button("Load Cached Local Data", width='stretch'):
                 set_state("historical_returns", cached_returns)
                 set_state("historical_prices", cached_prices)
                 set_state("tickers", list(cached_returns.columns))

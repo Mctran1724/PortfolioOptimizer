@@ -49,7 +49,7 @@ else:
             default=available_opts
         )
         
-        run_bt = st.button("Run Historical Backtest", use_container_width=True)
+        run_bt = st.button("Run Historical Backtest", width='stretch')
         
     with col2:
         if run_bt or "backtest_runs" in st.session_state:
@@ -105,7 +105,7 @@ else:
                 })
                 
             df_summary = pd.DataFrame(summary_data)
-            st.dataframe(df_summary, hide_index=True, use_container_width=True)
+            st.dataframe(df_summary, hide_index=True, width='stretch')
             
         else:
             st.info("Select portfolios on the left panel and click **'Run Historical Backtest'** to view cumulative performance paths.")

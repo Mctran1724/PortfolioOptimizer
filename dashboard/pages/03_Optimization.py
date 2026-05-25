@@ -74,7 +74,7 @@ else:
         max_beta = st.slider("Maximum Portfolio Beta", 0.50, 1.50, 1.10, 0.05)
         
         # Optimize Button
-        if st.button("Run Portfolio Optimizer", use_container_width=True):
+        if st.button("Run Portfolio Optimizer", width='stretch'):
             with st.spinner("Solving convex optimization problem..."):
                 
                 # Setup optimizer
@@ -223,7 +223,7 @@ else:
                             "Dollar Allocation": "${:,.2f}"
                         }),
                         hide_index=True,
-                        use_container_width=True
+                        width='stretch'
                     )
                     st.write(f"*(Calculated based on total portfolio value of **${portfolio_obj.total_value:,.2f}**)*")
                 else:
@@ -232,7 +232,7 @@ else:
                             "Allocation %": "{:.2f}%"
                         }),
                         hide_index=True,
-                        use_container_width=True
+                        width='stretch'
                     )
                 
                 # Show aggregate portfolio Beta

@@ -85,7 +85,7 @@ with tab1:
                 margin=dict(t=20, b=20, l=10, r=10),
                 legend=dict(orientation="h", y=1.05)
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
             # Show latest values
             val_5y = macro_df["T5YIE"].iloc[-1]
@@ -211,7 +211,7 @@ with tab3:
             yaxis=dict(title="Adjusted Crediting Rate (%)", gridcolor='rgba(255,255,255,0.05)'),
             margin=dict(t=10, b=10, l=10, r=10)
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 # ----------------------------------------------------
 # TAB 4: In-Plan Annuity Option Pricing
@@ -233,7 +233,7 @@ with tab4:
         vol = st.slider("Index Volatility (%)", 5.0, 35.0, 15.0, 1.0) / 100
         rf_rate = get_state("risk_free_rate")
         
-        if st.button("Run Stochastic Valuation", use_container_width=True):
+        if st.button("Run Stochastic Valuation", width='stretch'):
             with st.spinner("Valuing index option paths..."):
                 res = monte_carlo_annuity_pricing(
                     index_start=100.0,
