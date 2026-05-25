@@ -9,15 +9,16 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import streamlit as st
-from utils.state_management import initialize_state, get_state
+from utils.state_management import get_state, initialize_state
 
 # Page Configuration
 st.set_page_config(
     page_title="Investment Portfolio Optimizer",
     page_icon="./assets/logo/logo.png",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
+
 
 # Load custom styling
 def load_custom_css():
@@ -25,6 +26,7 @@ def load_custom_css():
     if os.path.exists(css_path):
         with open(css_path, "r") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 # Initialize Session State
 initialize_state()
@@ -34,12 +36,12 @@ load_custom_css()
 st.sidebar.markdown(
     """
     <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: #818CF8;">Antigravity Quant</h2>
+        <h2 style="margin: 0; color: #818CF8;">PortfolioIQ</h2>
         <p style="font-size: 0.8rem; color: #64748B;">Multi-Asset Risk & Portfolio Optimizer</p>
     </div>
     <hr style="border-color: rgba(255,255,255,0.05); margin: 0 0 20px 0;"/>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 # Main Page Content
@@ -54,7 +56,7 @@ st.markdown(
         </p>
     </div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 col1, col2 = st.columns([2, 1])
@@ -63,10 +65,10 @@ with col1:
     st.markdown("### 🎯 Strategic Framework Overview")
     st.markdown(
         """
-        This framework executes portfolio optimization and hedging models directly tailored for corporate employees 
-        holding highly-concentrated technology stock positions. By utilizing a **Self-Directed Brokerage Account (SDBA)** 
+        This framework executes portfolio optimization and hedging models directly tailored for corporate employees
+        holding highly-concentrated technology stock positions. By utilizing a **Self-Directed Brokerage Account (SDBA)**
         within a tax-advantaged account, we can dynamically reallocate capital without incurring capital gains tax drag.
-        
+
         #### Key Quantitative Pillars:
         1. **Asymmetrical Risk Optimization**: Moving beyond symmetrical variance (Sharpe Ratio) toward Downside Deviation (Sortino Ratio) and Conditional Value at Risk (CVaR).
         2. **Noise Denoising**: Filtering noisy correlation matrices via the **Marcenko-Pastur Random Matrix Theorem** before feeding them to optimizers.
@@ -77,7 +79,7 @@ with col1:
             * **In-Plan Annuities** (modeling indexed participation, cap, and floor structures)
         """
     )
-    
+
     st.markdown("### 🗺️ Dashboard Navigation Guide")
     st.markdown(
         """
@@ -90,7 +92,7 @@ with col1:
 
 with col2:
     st.markdown("### 📊 Active Universe Status")
-    
+
     # Render interactive state summary cards
     tickers = get_state("tickers")
     st.markdown(
@@ -99,13 +101,13 @@ with col2:
             <div class="metric-label">Monitored Assets</div>
             <div class="metric-value">{len(tickers)}</div>
             <div style="font-size: 0.9rem; color: #818CF8; margin-top: 5px;">
-                {', '.join(tickers)}
+                {", ".join(tickers)}
             </div>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-    
+
     rf_rate = get_state("risk_free_rate")
     st.markdown(
         f"""
@@ -117,13 +119,13 @@ with col2:
             </div>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-    
+
     has_data = get_state("historical_returns") is not None
     data_status = "READY" if has_data else "PENDING INGESTION"
     status_class = "delta-up" if has_data else "delta-down"
-    
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -134,7 +136,7 @@ with col2:
             </div>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 st.markdown("---")
@@ -144,5 +146,5 @@ st.markdown(
         Quantitative Portfolio Optimization Framework &bull; Designed by Antigravity Quant Team &copy; 2026
     </div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )

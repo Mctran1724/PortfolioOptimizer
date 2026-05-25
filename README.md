@@ -1,10 +1,10 @@
-# Antigravity Quant: Multi-Asset Portfolio Optimization & Risk Management Dashboard
+# PortfolioIQ: Multi-Asset Portfolio Optimization & Risk Management Dashboard
 
 [![Python](https://img.shields.io/badge/Python-3.14%2B-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/Framework-Streamlit-FF4B4B.svg)](https://streamlit.io/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](#)
 
-Antigravity Quant is an institutional-grade quantitative portfolio optimization and risk management framework. It is specifically designed to address the challenges faced by corporate employees holding highly concentrated technology equity positions (e.g., through stock-based compensation) who have access to a **Self-Directed Brokerage Account (SDBA)** inside a tax-advantaged (Roth 401k) retirement plan. 
+PortfolioIQ is an institutional-grade quantitative portfolio optimization and risk management framework. It is specifically designed to address the challenges faced by corporate employees holding highly concentrated technology equity positions (e.g., through stock-based compensation) who have access to a **Self-Directed Brokerage Account (SDBA)** inside a tax-advantaged (Roth 401k) retirement plan. 
 
 By leveraging tax-free rebalancing inside the Roth 401(k) wrapper, the framework allows participants to dynamically reallocate capital across standard equities, fixed-income assets, and alternative sleeves (such as Stable Value Funds and In-Plan Indexed Annuities) without triggering capital gains taxes or immediate tax drag.
 
